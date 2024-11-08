@@ -21,7 +21,6 @@ public class UserCredentialController {
     @PostMapping("/register")
     public String addUser(@RequestBody UserCredential userCredential)
     {
-
         return userCredentialService.saveUser(userCredential);
     }
 

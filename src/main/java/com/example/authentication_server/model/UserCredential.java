@@ -9,7 +9,7 @@ import org.springframework.data.mongodb.core.mapping.Document;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-@Document(collection = "Auth")
+@Document(collection = "auth")
 public class UserCredential {
     @Id
     private String authId;

@@ -22,14 +22,32 @@ public class UserCredentialService {
     @Autowired
     private PasswordEncoder passwordEncoder;
 
+    @CircuitBreaker(name = "cirsaveUser",  fallbackMethod = "fallbackSaveUser")
     public String saveUser(UserCredential userCredential) {
         userCredential.setPassword(passwordEncoder.encode(userCredential.getPassword()));
-        if(userCredentialRepo.save(userCredential) != null){
-            return "User saved successfully";
+        RestClient restClient = RestClient.create();
+        RoleDto roleDto = restClient.get()
+                .uri("http://localhost:9089/roles/" + userCredential.getRole().getRoleId())
+                .retrieve()
+                .body(RoleDto.class);
+        userCredential.setRole(roleDto);
+        if(userCredentialRepo.save(userCredential) != null) {
+            Boolean createUserCheck = restClient.post().uri("http://localhost:9091/user/" + userCredential.getEmail())
+                    .retrieve().body(Boolean.class);
+            if (createUserCheck == true) {
+                return "User saved successfully";
+            } else {
+                return "User not saved, check your credentials again";
+            }
         }
-        else{
-            return "User not saved";
+        else
+        {
+            return "User not saved, check your credentials again";
         }
+    }
+
+    public String fallbackSaveUser(UserCredential userCredential) {
+        return "User not saved, check your credentials again";
     }
 
     public String generateToken(String username){

@@ -1,5 +1,6 @@
 package com.example.authentication_server.service;
 
+import com.example.authentication_server.model.RoleDto;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.security.Keys;
@@ -30,12 +31,12 @@ public class JwtService {
         return Keys.hmacShaKeyFor(keyBytes);
     }
 
-    public String generateToken(String email) {
+    public String generateToken(String email, String role) {
         Map<String, Object> claims = new HashMap<>();
-        return createToken(claims, email);
+        return createToken(claims, email, role);
     }
 
-    private String createToken(Map<String, Object> claims, String email)
+    private String createToken(Map<String, Object> claims, String email, String role)
     {
         return Jwts
                 .builder()
@@ -43,6 +44,7 @@ public class JwtService {
                 .setSubject(email)
                 .setIssuedAt(new Date(System.currentTimeMillis()))
                 .setExpiration(new Date(System.currentTimeMillis()+(86400*1000)))
+                .claim("Role", role)
                 .signWith(getSignKey(), SignatureAlgorithm.HS256)
                 .compact();
     }
@@ -53,5 +55,16 @@ public class JwtService {
                 .setSigningKey(getSignKey())
                 .build()
                 .parseClaimsJws(token);
+    }
+
+    public String getRoleFromToken(String token) {
+        String role = Jwts
+                .parser()
+                .setSigningKey(getSignKey())
+                .build()
+                .parseClaimsJws(token)
+                .getBody()
+                .get("Role", String.class);
+        return role;
     }
 }

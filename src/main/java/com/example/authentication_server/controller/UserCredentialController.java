@@ -29,6 +29,11 @@ public class UserCredentialController {
         return userCredentialService.validateToken(token);
     }
 
+    @GetMapping("/extract/{token}")
+    public String extractRole(@PathVariable String token){
+        return userCredentialService.extractRole(token);
+    }
+
     @PostMapping("/validate/user")
     public String validateUser(@RequestBody UserCredential userCredential){
         Authentication authentication = authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(userCredential.getEmail(),userCredential.getPassword()));

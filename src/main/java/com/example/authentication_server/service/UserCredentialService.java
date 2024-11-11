@@ -50,12 +50,17 @@ public class UserCredentialService {
         return "User not saved, check your credentials again";
     }
 
-    public String generateToken(String username){
-        return jwtService.generateToken(username);
+    public String generateToken(String email){
+        String role = userCredentialRepo.findByEmail(email).get().getRole().getRoleName();
+        return jwtService.generateToken(email, role);
     }
 
     public boolean validateToken(String token){
         jwtService.validateToken(token);
         return true;
+    }
+
+    public String extractRole(String token){
+        return jwtService.getRoleFromToken(token);
     }
 }

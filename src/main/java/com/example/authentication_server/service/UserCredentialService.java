@@ -24,15 +24,20 @@ public class UserCredentialService {
 
     @CircuitBreaker(name = "cirsaveUser",  fallbackMethod = "fallbackSaveUser")
     public String saveUser(UserCredential userCredential) {
+        if(userCredentialRepo.findByEmail(userCredential.getEmail()).isPresent())
+        {
+            return "User already exists";
+        }
         userCredential.setPassword(passwordEncoder.encode(userCredential.getPassword()));
         RestClient restClient = RestClient.create();
         RoleDto roleDto = restClient.get()
-                .uri("http://localhost:9089/roles/" + userCredential.getRole().getRoleId())
+                .uri("http://localhost:9088/roles/" + userCredential.getRole().getRoleId())
                 .retrieve()
                 .body(RoleDto.class);
         userCredential.setRole(roleDto);
         if(userCredentialRepo.save(userCredential) != null) {
-            Boolean createUserCheck = restClient.post().uri("http://localhost:9091/user/" + userCredential.getEmail())
+            Boolean createUserCheck = restClient.post()
+                    .uri("http://localhost:9091/user/" + userCredential.getEmail())
                     .retrieve().body(Boolean.class);
             if (createUserCheck == true) {
                 return "User saved successfully";
@@ -62,5 +67,14 @@ public class UserCredentialService {
 
     public String extractRole(String token){
         return jwtService.getRoleFromToken(token);
+    }
+
+    public String getUserIdFromEmail(String email)
+    {
+        RestClient restClient = RestClient.create();
+        return restClient.get()
+                .uri("http://localhost:9091/user/retrieve-id/" + email)
+                .retrieve()
+                .body(String.class);
     }
 }

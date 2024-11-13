@@ -2,6 +2,7 @@ package com.example.authentication_server.controller;
 
 import com.example.authentication_server.model.UserCredential;
 import com.example.authentication_server.service.UserCredentialService;
+import jakarta.ws.rs.Path;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -45,6 +46,12 @@ public class UserCredentialController {
         {
             return "User not authenticated!";
         }
+    }
+
+    @GetMapping("/{email}")
+    public String getUserIdFromEmail(@PathVariable String email)
+    {
+        return userCredentialService.getUserIdFromEmail(email);
     }
 
 }

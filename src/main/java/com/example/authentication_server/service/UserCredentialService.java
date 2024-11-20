@@ -77,4 +77,14 @@ public class UserCredentialService {
                 .retrieve()
                 .body(String.class);
     }
+
+    public boolean deleteUser(String email)
+    {
+        userCredentialRepo.deleteByEmail(email);
+        if(userCredentialRepo.findByEmail(email).isPresent())
+        {
+            return false;
+        }
+        return true;
+    }
 }

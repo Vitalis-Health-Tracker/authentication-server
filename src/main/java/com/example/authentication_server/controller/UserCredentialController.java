@@ -54,4 +54,9 @@ public class UserCredentialController {
         return userCredentialService.getUserIdFromEmail(email);
     }
 
+    @DeleteMapping("/{email}")
+    public boolean deleteUser(@PathVariable String email)
+    {
+        return userCredentialService.deleteUser(email);
+    }
 }
